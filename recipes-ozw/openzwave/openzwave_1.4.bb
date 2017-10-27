@@ -5,11 +5,12 @@ DESCRIPTION = "openzwave allow to control device that use zwave protocole for ho
 AUTHOR = "modjo.buggy22@orange.fr"
  
 DEPENDS = "\
-    eudev  \
-    automake     \
+    systemd \
 "
 
 S = "${WORKDIR}/git"
+
+inherit pkgconfig
 
 LICENSE = "Apache-2.0 & GPLv2 & LGPLv2+ "
 
@@ -29,18 +30,18 @@ do_configure[noexec] = "1"
 
 do_compile() {
     export PREFIX="${D}${prefix}"
-    export pkgconfigdir="${PKG_CONFIG_DIR}"
-    export instlibdir="${D}${prefix}${base_libdir}"
+    export pkgconfigdir="${PREFIX}${base_libdir}/pkgconfig"
+    export instlibdir="${PREFIX}${base_libdir}"
     make BITBAKE_ENV=1
-
 }
 
 do_install () {
     export PREFIX="${D}${prefix}"
-    export pkgconfigdir="${PKG_CONFIG_DIR}"
-    export instlibdir="${D}${prefix}${base_libdir}"
+    export pkgconfigdir="${PREFIX}${base_libdir}/pkgconfig"
+    export instlibdir="${PREFIX}${base_libdir}"
     make BITBAKE_ENV=1 install
+    sed "s|${D}||" -i ${pkgconfigdir}/libopenzwave.pc
 }
 
-
 FILES_${PN} += "${prefix}${sysconfdir}/${PN}/*"
+FILES_${PN}-dev += "${prefix}${base_libdir}/pkgconfig/*.pc"
